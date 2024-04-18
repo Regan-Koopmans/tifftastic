@@ -56,6 +56,32 @@ int render() {
   }
 }
 
+char *get_tag_name(int number) {
+  switch (number) {
+  case 256:
+    return "Image Width";
+  case 257:
+    return "Image Length";
+  case 259:
+    return "Compression";
+  case 262:
+    return "Photometric Interpretation";
+  case 273:
+    return "Strip Offsets";
+  case 278:
+    return "Rows Per Strip";
+  case 279:
+    return "Strip Byte Counts";
+  case 282:
+    return "XResolution";
+  case 283:
+    return "YResolution";
+  case 296:
+    return "Resolution Unit";
+  default:
+    return "Unknown";
+  }
+}
 
 struct Result read_data() {
   FILE *fptr;
@@ -71,10 +97,10 @@ struct Result read_data() {
   fseek(fptr, header.ifd_offset, 0);
   fread(&directory, sizeof(struct TifDirectory), 1, fptr);
 
-  char* data_types[] = {"BYTE", "ASCII", "SHORT", "SHORT", "RATIONAL"};
+  char *data_types[] = {"BYTE", "ASCII", "SHORT", "SHORT", "RATIONAL"};
   for (int i = 0; i < directory.entry_count; i++) {
     fread(&tag, sizeof(struct TifTag), 1, fptr);
-    printf("Tag ID: %i\n", tag.tag_id);
+    printf("Tag ID: %s\n", get_tag_name(tag.tag_id));
     printf("Data Type: %s\n", data_types[tag.data_type]);
     printf("Value count: %i\n", tag.data_count);
     printf("Data Offset: %i\n", tag.data_offset);
