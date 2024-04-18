@@ -101,7 +101,7 @@ struct Result read_data() {
   for (int i = 0; i < directory.entry_count; i++) {
     fread(&tag, sizeof(struct TifTag), 1, fptr);
     printf("Tag ID: %s\n", get_tag_name(tag.tag_id));
-    printf("Data Type: %s\n", data_types[tag.data_type]);
+    printf("Data Type: %s\n", data_types[tag.data_type-1]);
     printf("Value count: %i\n", tag.data_count);
     printf("Data Offset: %i\n", tag.data_offset);
   }
