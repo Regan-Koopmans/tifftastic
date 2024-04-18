@@ -7,16 +7,29 @@
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 
+/*
+ * The tiff header appears right at the start of the file.
+ * The header gives us a byte order for the file, and a
+ * magic number of 42 to indicate that this is indeed a
+ * tiff file. An offset tells us where the first TifDirectory is
+ */
 struct TifHeader {
-  char byte_order[2];
-  char magic_number[2];
+  short byte_order;
+  short magic_number;
   int ifd_offset;
 };
 
+/*
+ */
 struct TifDirectory {
   short entry_count;
 };
 
+/*
+ * A tiff tag is one attribute associated with an image layer
+ * in the tiff file. This could be, for instance, the width
+ * of the layer, or the compression scheme used
+ */
 struct TifTag {
   short tag_id;    /* The tag identifier  */
   short data_type; /* The scalar type of the data items  */
@@ -56,33 +69,6 @@ int render() {
   }
 }
 
-char *get_tag_name(int number) {
-  switch (number) {
-  case 256:
-    return "Image Width";
-  case 257:
-    return "Image Length";
-  case 259:
-    return "Compression";
-  case 262:
-    return "Photometric Interpretation";
-  case 273:
-    return "Strip Offsets";
-  case 278:
-    return "Rows Per Strip";
-  case 279:
-    return "Strip Byte Counts";
-  case 282:
-    return "XResolution";
-  case 283:
-    return "YResolution";
-  case 296:
-    return "Resolution Unit";
-  default:
-    return "Unknown";
-  }
-}
-
 struct Result read_data() {
   FILE *fptr;
   struct TifHeader header;
@@ -101,7 +87,7 @@ struct Result read_data() {
   for (int i = 0; i < directory.entry_count; i++) {
     fread(&tag, sizeof(struct TifTag), 1, fptr);
     printf("Tag ID: %s\n", get_tag_name(tag.tag_id));
-    printf("Data Type: %s\n", data_types[tag.data_type-1]);
+    printf("Data Type: %s\n", data_types[tag.data_type - 1]);
     printf("Value count: %i\n", tag.data_count);
     printf("Data Offset: %i\n", tag.data_offset);
   }
