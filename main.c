@@ -80,7 +80,7 @@ int render(struct ImageData *data) {
   }
 }
 
-struct Result read_data() {
+struct Result read_data(char * filename) {
   FILE *fptr;
   struct TifHeader header;
   struct TifDirectory directory;
@@ -145,6 +145,7 @@ struct Result read_data() {
 
   unsigned char * pixels = malloc(total);
   int total_pointer = 0;
+  // First read the packed bits into a buffer, then expand
   for (int i = 0; i < strip_count; i++) {
     fseek(fptr, strip_offsets[i], 0);
     unsigned char * other = malloc(strip_bytes[i]);
@@ -171,8 +172,12 @@ struct Result read_data() {
   return SOME(data);
 }
 
-int main() {
-  struct Result result = read_data();
+int main(int argc, char ** argv) {
+  if (argc < 2) {
+    printf("Please provide a file path to open\n");
+    return 0;
+  }
+  struct Result result = read_data(argv[1]);
   if (result.is_error) {
     printf("Could not read tiff file, nested error: %s\n", result.value);
   }
