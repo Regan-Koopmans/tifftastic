@@ -5,42 +5,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-/*
- * The tiff header appears right at the start of the file.
- * The header gives us a byte order for the file, and a
- * magic number of 42 to indicate that this is indeed a
- * tiff file. An offset tells us where the first TifDirectory is
- */
-struct TifHeader {
-  short byte_order;
-  short magic_number;
-  int ifd_offset;
-};
-
-/*
- */
-struct TifDirectory {
-  short entry_count;
-};
-
-/*
- * A tiff tag is one attribute associated with an image layer
- * in the tiff file. This could be, for instance, the width
- * of the layer, or the compression scheme used
- */
-struct TifTag {
-  short tag_id;    /* The tag identifier  */
-  short data_type; /* The scalar type of the data items  */
-  int data_count;  /* The number of items in the tag data  */
-  int data_offset; /* The byte offset to the data items  */
-};
-
-struct ImageData {
-  int width;
-  int height;
-  char * pixels;
-};
-
 int render(struct ImageData *data) {
   SDL_Window *window = NULL;
   SDL_Surface *screenSurface = NULL;
@@ -78,6 +42,7 @@ int render(struct ImageData *data) {
       quit = true;
     }
   }
+  return 0;
 }
 
 struct Result read_data(char * filename) {
@@ -183,6 +148,5 @@ int main(int argc, char ** argv) {
   }
   render(result.value);
   free(result.value);
-  printf("Exit");
   return 0;
 }
