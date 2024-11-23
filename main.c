@@ -178,5 +178,6 @@ int main() {
   }
   render(result.value);
   free(result.value);
+  printf("Exit");
   return 0;
 }
