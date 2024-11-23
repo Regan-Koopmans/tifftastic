@@ -150,8 +150,8 @@ struct Result read_data(char * filename) {
     fseek(fptr, strip_offsets[i], 0);
     unsigned char * other = malloc(strip_bytes[i]);
     fread(other, sizeof(char), strip_bytes[i], fptr);
-    int expected = expected_length(other, strip_bytes[i]);
-    unsigned char * unpacked = unpack(other, strip_bytes[0], expected);
+    size_t expected = expected_length(other, strip_bytes[i]);
+    unsigned char * unpacked = unpack(other, strip_bytes[i], expected);
     for (int j = 0; j < expected; j++) {
       pixels[total_pointer] = unpacked[j];
       total_pointer += 1;
