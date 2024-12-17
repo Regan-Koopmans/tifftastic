@@ -1,6 +1,7 @@
 #include "result.h"
 #include "tiff.h"
 #include "pack_bits.c"
+#include "arena.h"
 #include <SDL.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -102,10 +103,10 @@ struct Result read_data(char * filename) {
   int total = 0;
   for (int i = 0; i < strip_count; i++) {
     fseek(fptr, strip_offsets[i], 0);
-    unsigned char * other = malloc(strip_bytes[i]);
-    fread(other, sizeof(char), strip_bytes[i], fptr);
-    total += expected_length(other, strip_bytes[i]);
-    free(other);
+    unsigned char * temp_strip_buffer = malloc(strip_bytes[i]);
+    fread(temp_strip_buffer, sizeof(char), strip_bytes[i], fptr);
+    total += expected_length(temp_strip_buffer, strip_bytes[i]);
+    free(temp_strip_buffer);
   }
 
   unsigned char * pixels = malloc(total);
@@ -113,15 +114,15 @@ struct Result read_data(char * filename) {
   // First read the packed bits into a buffer, then expand
   for (int i = 0; i < strip_count; i++) {
     fseek(fptr, strip_offsets[i], 0);
-    unsigned char * other = malloc(strip_bytes[i]);
-    fread(other, sizeof(char), strip_bytes[i], fptr);
-    size_t expected = expected_length(other, strip_bytes[i]);
-    unsigned char * unpacked = unpack(other, strip_bytes[i], expected);
+    unsigned char * temp_strip_buffer = malloc(strip_bytes[i]);
+    fread(temp_strip_buffer, sizeof(char), strip_bytes[i], fptr);
+    size_t expected = expected_length(temp_strip_buffer, strip_bytes[i]);
+    unsigned char * unpacked = unpack(temp_strip_buffer, strip_bytes[i], expected);
     for (int j = 0; j < expected; j++) {
       pixels[total_pointer] = unpacked[j];
       total_pointer += 1;
     }
-    free(other);
+    free(temp_strip_buffer);
     free(unpacked);
   }
   
